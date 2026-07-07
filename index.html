@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neural Network Forward-Pass Visualizer — MathCanvasMJ</title>
+<style>
+  :root{
+    --ink:#1a237e; --body:#333; --teal:#00897b; --panel:#f5f5f5;
+    --pos:#1976d2; --neg:#e53935; --edge:#9aa5b1; --line:#e0e0e0;
+    --node-fill:#ffffff; --node-stroke:#1a237e; --hi:#ffca28;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:var(--body);background:#fafafa}
+  header{background:var(--ink);color:#fff;padding:14px 22px}
+  header h1{margin:0;font-size:18px;font-weight:600}
+  header .sub{opacity:.8;font-size:12px;margin-top:2px}
+  .wrap{display:flex;min-height:calc(100vh - 56px)}
+  .controls{width:290px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+            padding:16px;overflow-y:auto}
+  .stage{flex:1;position:relative;overflow:auto}
+  .grp{margin-bottom:18px}
+  .grp h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink)}
+  label{display:block;font-size:12px;margin:8px 0 3px;color:#555}
+  input[type=text],select,input[type=number]{width:100%;padding:6px 8px;border:1px solid #ccc;
+            border-radius:5px;font-size:13px;background:#fff}
+  .row{display:flex;gap:8px}
+  .row>*{flex:1}
+  button{cursor:pointer;border:none;border-radius:5px;padding:8px 10px;font-size:13px;
+          background:var(--teal);color:#fff;font-weight:600;width:100%;margin-top:8px}
+  button.sec{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+  button:hover{filter:brightness(1.06)}
+  .chk{display:flex;align-items:center;gap:8px;font-size:12px;margin:6px 0}
+  .chk input{width:auto}
+  .inputs-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .inputs-grid label{margin:0;align-self:center}
+  .inputs-grid input{padding:4px 6px}
+  #panel{position:absolute;top:12px;right:12px;width:250px;background:#fff;border:1px solid var(--line);
+          border-radius:8px;padding:12px 14px;font-size:13px;box-shadow:0 2px 12px rgba(0,0,0,.08);
+          display:none}
+  #panel h4{margin:0 0 6px;color:var(--ink);font-size:13px}
+  #panel .eq{font-family:'Cambria Math',Georgia,serif;line-height:1.7;word-break:break-word}
+  .hint{font-size:11px;color:#888;margin-top:4px;line-height:1.4}
+  svg text{font-family:'Cambria Math',Georgia,serif}
+  .legend{position:absolute;bottom:12px;left:12px;background:#fff;border:1px solid var(--line);
+           border-radius:8px;padding:8px 12px;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .legend span{display:inline-flex;align-items:center;gap:5px;margin-right:12px}
+  .swatch{width:14px;height:4px;border-radius:2px;display:inline-block}
+</style>
+</head>
+<body>
+<header>
+  <h1>Neural Network Forward-Pass Visualizer</h1>
+  <div class="sub">Weights on edges · z and σ(z) inside every neuron · live computation — MathCanvasMJ</div>
+</header>
+
+<div class="wrap">
+  <aside class="controls">
+    <div class="grp">
+      <h3>Architecture</h3>
+      <label>Layer sizes (comma separated)</label>
+      <input id="arch" type="text" value="3,4,2" />
+      <div class="hint">First = inputs, last = outputs. e.g. <code>2,3,1</code></div>
+      <button class="sec" id="applyArch">Apply architecture</button>
+    </div>
+
+    <div class="grp">
+      <h3>Inputs (x)</h3>
+      <div id="inputsGrid" class="inputs-grid"></div>
+    </div>
+
+    <div class="grp">
+      <h3>Activation</h3>
+      <label>Hidden layers</label>
+      <select id="actHidden">
+        <option value="sigmoid">σ  sigmoid</option>
+        <option value="tanh">tanh</option>
+        <option value="relu">ReLU</option>
+        <option value="identity">identity (linear)</option>
+      </select>
+      <label>Output layer</label>
+      <select id="actOut">
+        <option value="sigmoid">σ  sigmoid</option>
+        <option value="softmax">softmax (classification)</option>
+        <option value="tanh">tanh</option>
+        <option value="relu">ReLU</option>
+        <option value="none">none — linear, z only (regression)</option>
+      </select>
+    </div>
+
+    <div class="grp">
+      <h3>Edge labels</h3>
+      <select id="edgeLabel">
+        <option value="both">symbol = value  (w₂₁ = 0.83)</option>
+        <option value="symbol">symbol only  (w₂₁)</option>
+        <option value="value">value only  (0.83)</option>
+        <option value="none">none</option>
+      </select>
+      <div class="chk"><input type="checkbox" id="showBias" checked><label style="margin:0">Show biases (b)</label></div>
+      <div class="chk"><input type="checkbox" id="colorSign" checked><label style="margin:0">Colour edges by sign (+/−)</label></div>
+      <div class="chk"><input type="checkbox" id="widthMag" checked><label style="margin:0">Edge width ∝ |weight|</label></div>
+    </div>
+
+    <div class="grp">
+      <h3>Actions</h3>
+      <button id="randomize">🎲 Randomize weights</button>
+      <button id="animate" class="sec">▶ Animate forward pass</button>
+      <button id="export" class="sec">⬇ Export SVG</button>
+    </div>
+    <div class="hint">Click any <b>weight label</b> or <b>bias</b> to edit it. Hover a neuron to expand its equation.</div>
+  </aside>
+
+  <main class="stage">
+    <svg id="net" width="100%" height="100%"></svg>
+    <div id="panel">
+      <h4 id="panelTitle"></h4>
+      <div class="eq" id="panelEq"></div>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--pos)"></span>positive weight</span>
+      <span><span class="swatch" style="background:var(--neg)"></span>negative weight</span>
+      <span>neuron: top = z, bottom = σ(z)</span>
+    </div>
+  </main>
+</div>
+
+<script>
+const SVGNS = "http://www.w3.org/2000/svg";
+
+// ---------- Model state ----------
+let arch = [3,4,2];          // neurons per layer
+let inputs = [];             // input values (length arch[0])
+let W = [];                  // W[l][j][k] = weight into neuron j of layer l+1 from neuron k of layer l
+let B = [];                  // B[l][j]    = bias of neuron j in layer l+1
+let acts = [];               // acts[l][j] = activation a of neuron j in layer l
+let zs   = [];               // zs[l][j]   = pre-activation z of neuron j in layer l
+
+// deterministic-ish pseudo random so re-renders are stable until "Randomize" is pressed
+let seed = 42;
+function rnd(){ seed = (seed*1103515245 + 12345) & 0x7fffffff; return (seed/0x7fffffff)*2 - 1; } // [-1,1]
+
+function initInputs(){
+  inputs = Array.from({length:arch[0]}, (_,i)=> inputs[i] ?? +(rnd()*0.9).toFixed(2));
+}
+function initWeights(){
+  W = []; B = [];
+  for(let l=0;l<arch.length-1;l++){
+    const rows=[], biases=[];
+    for(let j=0;j<arch[l+1];j++){
+      const row=[];
+      for(let k=0;k<arch[l];k++) row.push(+rnd().toFixed(2));
+      rows.push(row); biases.push(+rnd().toFixed(2));
+    }
+    W.push(rows); B.push(biases);
+  }
+}
+
+// ---------- Activation functions ----------
+// This is the mathematical heart of the app. Each returns the activated value of z.
+const ACT = {
+  sigmoid:  z => 1/(1+Math.exp(-z)),
+  tanh:     z => Math.tanh(z),
+  relu:     z => Math.max(0, z),
+  identity: z => z,
+};
+function activate(zVec, name){
+  if(name === "softmax"){
+    const m = Math.max(...zVec);
+    const ex = zVec.map(z=>Math.exp(z-m));
+    const s = ex.reduce((a,b)=>a+b,0);
+    return ex.map(e=>e/s);
+  }
+  if(name === "none") return zVec.slice();   // linear output: a = z
+  const f = ACT[name] || ACT.sigmoid;
+  return zVec.map(f);
+}
+const actSymbol = { sigmoid:"σ", tanh:"tanh", relu:"ReLU", softmax:"softmax", identity:"id", none:"—" };
+// Hidden layers use the hidden activation; the final layer uses the output activation.
+function actForLayer(l){
+  const isOut = (l === arch.length-1);
+  return isOut ? document.getElementById("actOut").value
+               : document.getElementById("actHidden").value;
+}
+
+// ---------- Forward pass ----------
+function forward(){
+  acts = [ inputs.slice() ];      // layer 0 activations = inputs
+  zs   = [ inputs.slice() ];      // layer 0 has no z; mirror inputs for indexing
+  for(let l=0;l<W.length;l++){
+    const prev = acts[l];
+    const zVec = [];
+    for(let j=0;j<W[l].length;j++){
+      let z = B[l][j];
+      for(let k=0;k<prev.length;k++) z += W[l][j][k]*prev[k];
+      zVec.push(z);
+    }
+    const aVec = activate(zVec, actForLayer(l+1));   // layer l+1 in full arch
+    zs.push(zVec); acts.push(aVec);
+  }
+}
+
+// ---------- Geometry ----------
+function layout(){
+  const svg = document.getElementById("net");
+  const W0 = svg.clientWidth || 900, H0 = svg.clientHeight || 600;
+  const nL = arch.length;
+  const marginX = 120, marginY = 85;
+  const usableW = Math.max(W0 - 2*marginX, 300);
+  const gapX = nL>1 ? usableW/(nL-1) : 0;
+  const R = Math.max(18, Math.min(30, 320/Math.max(...arch)));
+  const pos = [];
+  for(let l=0;l<nL;l++){
+    const n = arch[l];
+    const usableH = Math.max(H0 - 2*marginY, 200);
+    const gapY = n>1 ? usableH/(n-1) : 0;
+    const startY = n>1 ? marginY : H0/2;
+    const col = [];
+    for(let j=0;j<n;j++) col.push({ x: marginX + l*gapX, y: startY + j*gapY });
+    pos.push(col);
+  }
+  return {pos, R, W0, H0};
+}
+
+// ---------- Rendering ----------
+let geo;
+function render(){
+  forward();
+  const svg = document.getElementById("net");
+  svg.innerHTML = "";
+  geo = layout();
+  const {pos, R} = geo;
+
+  const showBias   = document.getElementById("showBias").checked;
+  const colorSign  = document.getElementById("colorSign").checked;
+  const widthMag   = document.getElementById("widthMag").checked;
+  const labelMode  = document.getElementById("edgeLabel").value;
+
+  // --- edges + weight labels ---
+  for(let l=0;l<W.length;l++){
+    for(let j=0;j<W[l].length;j++){
+      for(let k=0;k<arch[l];k++){
+        const a = pos[l][k], b = pos[l+1][j];
+        const w = W[l][j][k];
+        const line = el("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,
+          stroke: colorSign ? (w>=0?"var(--pos)":"var(--neg)") : "var(--edge)",
+          "stroke-width": widthMag ? (0.6+Math.min(4,Math.abs(w)*2.2)) : 1.4,
+          "stroke-opacity":0.55, "data-edge":`${l}-${j}-${k}`});
+        svg.appendChild(line);
+
+        if(labelMode!=="none"){
+          const t = 0.34; // place label ~1/3 along, near source, to reduce overlap
+          const lx = a.x + (b.x-a.x)*t, ly = a.y + (b.y-a.y)*t;
+          const sym = `w`, sub = `${j+1}${k+1}`;
+          let txt;
+          if(labelMode==="symbol") txt = null;
+          else if(labelMode==="value") txt = w.toFixed(2);
+          else txt = w.toFixed(2);
+          const g = el("g",{class:"wlabel","data-w":`${l}-${j}-${k}`,style:"cursor:pointer"});
+          const bg = el("rect",{x:lx-16,y:ly-9,width:32,height:16,rx:3,fill:"#fff",
+                                "fill-opacity":0.82,stroke:"var(--line)"});
+          g.appendChild(bg);
+          const label = el("text",{x:lx,y:ly+4,"text-anchor":"middle","font-size":11,
+                                   fill:w>=0?"var(--pos)":"var(--neg)"});
+          if(labelMode==="symbol" || labelMode==="both"){
+            label.appendChild(mkTspan(sym));
+            label.appendChild(mkTspan(sub,{dy:3,"font-size":8}));
+            if(labelMode==="both"){
+              label.appendChild(mkTspan("="+w.toFixed(2),{dy:-3}));
+            }
+          } else { label.textContent = txt; }
+          // fit bg to label width heuristically
+          const wpx = (labelMode==="both"?58:labelMode==="value"?30:26);
+          bg.setAttribute("x", lx-wpx/2); bg.setAttribute("width", wpx);
+          g.appendChild(label);
+          g.onclick = ev => { ev.stopPropagation(); editWeight(l,j,k,lx,ly); };
+          svg.appendChild(g);
+        }
+      }
+    }
+  }
+
+  // --- neurons ---
+  for(let l=0;l<arch.length;l++){
+    for(let j=0;j<arch[l];j++){
+      const p = pos[l][j];
+      const g = el("g",{class:"neuron","data-n":`${l}-${j}`,style:"cursor:pointer"});
+      const circle = el("circle",{cx:p.x,cy:p.y,r:R,fill:"var(--node-fill)",
+                                  stroke:"var(--node-stroke)","stroke-width":2});
+      g.appendChild(circle);
+
+      if(l===0){
+        // input neuron: just x value
+        g.appendChild(text(p.x, p.y+5, inputs[j].toFixed(2), {"font-size":13,"font-weight":600}));
+        g.appendChild(text(p.x, p.y-R-8, `x${sub(j+1)}`, {"font-size":13,fill:"var(--ink)","text-anchor":"middle"}));
+      } else {
+        const linearOut = (l===arch.length-1 && actForLayer(l)==="none");
+        if(linearOut){
+          // linear output neuron (regression): show z only, no activation
+          g.appendChild(text(p.x, p.y+5, "z="+zs[l][j].toFixed(2), {"font-size":13,"font-weight":700,fill:"var(--ink)"}));
+        } else {
+          // hidden/output neuron: split z (top) and a=act(z) (bottom)
+          svg.appendChild(el("line",{x1:p.x-R,y1:p.y,x2:p.x+R,y2:p.y,stroke:"var(--line)"}));
+          g.appendChild(text(p.x, p.y-6, "z="+zs[l][j].toFixed(2), {"font-size":11,fill:"#555"}));
+          g.appendChild(text(p.x, p.y+13, acts[l][j].toFixed(2), {"font-size":12,"font-weight":700,fill:"var(--teal)"}));
+        }
+        // neuron name above
+        const nm = (l===arch.length-1) ? `ŷ${sub(j+1)}` : `h${sub(j+1)}⁽${supNum(l)}⁾`;
+        g.appendChild(text(p.x, p.y-R-8, nm, {"font-size":12,fill:"var(--ink)"}));
+        // bias below
+        if(showBias){
+          const bt = text(p.x, p.y+R+15, `b${sub(j+1)}=${B[l-1][j].toFixed(2)}`,
+                          {"font-size":10,fill:"#999",style:"cursor:pointer"});
+          bt.onclick = ev => { ev.stopPropagation(); editBias(l-1,j,p.x,p.y+R+15); };
+          g.appendChild(bt);
+        }
+      }
+      g.onmouseenter = () => highlight(l,j);
+      g.onmouseleave = () => { clearHi(); document.getElementById("panel").style.display="none"; };
+      svg.appendChild(g);
+    }
+    // layer caption
+    const cap = l===0?"Input":(l===arch.length-1?"Output":`Hidden ${l}`);
+    svg.appendChild(text(pos[l][0].x, 24, cap, {"font-size":13,fill:"#bbb","font-weight":700,
+                    "letter-spacing":"0.5px"}));
+  }
+}
+
+// ---------- Hover: highlight incoming edges + show equation ----------
+function highlight(l,j){
+  clearHi();
+  if(l===0) return;
+  document.querySelectorAll(`[data-edge]`).forEach(e=>{
+    const [ll,jj] = e.getAttribute("data-edge").split("-");
+    if(+ll===l-1 && +jj===j){ e.setAttribute("stroke-opacity",1); e.setAttribute("stroke-width",
+       (parseFloat(e.getAttribute("stroke-width"))+1.5)); e.classList.add("hi"); }
+  });
+  // build equation
+  const name = actForLayer(l);
+  let terms = [];
+  for(let k=0;k<arch[l-1];k++){
+    terms.push(`w${sub2(j+1,k+1)}·a${sub(k+1)}`);
+  }
+  const num = W[l-1][j].map((w,k)=>`(${w.toFixed(2)})(${acts[l-1][k].toFixed(2)})`).join(" + ");
+  const z = zs[l][j], a = acts[l][j];
+  const sym = actSymbol[name]||"σ";
+  document.getElementById("panelTitle").innerHTML =
+     (l===arch.length-1?`Output ŷ`:`Hidden neuron h`)+`<sub>${j+1}</sub>`;
+  document.getElementById("panelEq").innerHTML =
+    `z = ${terms.join(" + ")} + b<sub>${j+1}</sub><br>`+
+    `&nbsp;&nbsp;= ${num} + (${B[l-1][j].toFixed(2)})<br>`+
+    `&nbsp;&nbsp;= <b>${z.toFixed(3)}</b><br><br>`+
+    (name==="none"
+      ? `output = z  (linear) = <b style="color:var(--teal)">${a.toFixed(3)}</b>`
+      : `a = ${sym}(z) = <b style="color:var(--teal)">${a.toFixed(3)}</b>`);
+  document.getElementById("panel").style.display="block";
+}
+function clearHi(){
+  document.querySelectorAll(".hi").forEach(e=>{ e.classList.remove("hi"); e.setAttribute("stroke-opacity",0.55);
+    const w=parseFloat(e.getAttribute("stroke-width")); if(w) e.setAttribute("stroke-width", Math.max(0.6,w-1.5)); });
+}
+
+// ---------- Inline editing ----------
+function editWeight(l,j,k,x,y){ openEditor(x,y,W[l][j][k],v=>{W[l][j][k]=v; render();}); }
+function editBias(l,j,x,y){ openEditor(x,y,B[l][j],v=>{B[l][j]=v; render();}); }
+function openEditor(x,y,val,cb){
+  const svg=document.getElementById("net");
+  const rect=svg.getBoundingClientRect();
+  const inp=document.createElement("input");
+  inp.type="number"; inp.step="0.1"; inp.value=val;
+  inp.style.cssText=`position:absolute;left:${rect.left+x-28}px;top:${rect.top+y-12}px;width:60px;
+      z-index:50;font-size:13px;padding:2px 4px;border:2px solid var(--teal);border-radius:4px`;
+  document.body.appendChild(inp); inp.focus(); inp.select();
+  const done=()=>{ const v=parseFloat(inp.value); if(!isNaN(v)) cb(+v.toFixed(3)); inp.remove(); };
+  inp.onblur=done;
+  inp.onkeydown=e=>{ if(e.key==="Enter") done(); if(e.key==="Escape") inp.remove(); };
+}
+
+// ---------- Forward-pass animation ----------
+async function animate(){
+  render();
+  const layersG = [];
+  for(let l=0;l<arch.length;l++){
+    layersG.push([...document.querySelectorAll(`[data-n^="${l}-"]`)]);
+  }
+  // dim all, then reveal layer by layer
+  document.querySelectorAll(".neuron").forEach(n=>n.style.opacity=0.15);
+  document.querySelectorAll("line[data-edge]").forEach(e=>e.style.opacity=0.08);
+  for(let l=0;l<arch.length;l++){
+    layersG[l].forEach(n=>{ n.style.transition="opacity .35s"; n.style.opacity=1;
+      const c=n.querySelector("circle"); if(c){ c.setAttribute("stroke","var(--hi)");
+        setTimeout(()=>c.setAttribute("stroke","var(--node-stroke)"),450); } });
+    if(l<arch.length-1){
+      document.querySelectorAll(`line[data-edge^="${l}-"]`).forEach(e=>{
+        e.style.transition="opacity .35s"; e.style.opacity=0.55; });
+    }
+    await sleep(550);
+  }
+}
+
+// ---------- Export ----------
+function exportSVG(){
+  const svg=document.getElementById("net").cloneNode(true);
+  svg.setAttribute("xmlns",SVGNS);
+  svg.setAttribute("width",geo.W0); svg.setAttribute("height",geo.H0);
+  const blob=new Blob(['<?xml version="1.0"?>\n'+svg.outerHTML],{type:"image/svg+xml"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="neural_network.svg"; a.click();
+}
+
+// ---------- Small helpers ----------
+function el(tag,attrs){ const e=document.createElementNS(SVGNS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
+function text(x,y,str,attrs={}){ const t=el("text",Object.assign({x,y,"text-anchor":"middle"},attrs));
+  t.textContent=str; return t; }
+function mkTspan(str,attrs={}){ const t=el("tspan",attrs); t.textContent=str; return t; }
+const subs="₀₁₂₃₄₅₆₇₈₉", sups="⁰¹²³⁴⁵⁶⁷⁸⁹";
+function sub(n){ return String(n).split("").map(d=>subs[+d]).join(""); }
+function sub2(a,b){ return sub(a)+sub(b); }
+function supNum(n){ return String(n).split("").map(d=>sups[+d]).join(""); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ---------- Wire up controls ----------
+function buildInputsGrid(){
+  const grid=document.getElementById("inputsGrid"); grid.innerHTML="";
+  for(let i=0;i<arch[0];i++){
+    const lab=document.createElement("label"); lab.innerHTML=`x${i+1}`;
+    const inp=document.createElement("input"); inp.type="number"; inp.step="0.1"; inp.value=inputs[i];
+    inp.oninput=()=>{ const v=parseFloat(inp.value); if(!isNaN(v)){ inputs[i]=+v; render(); } };
+    grid.appendChild(lab); grid.appendChild(inp);
+  }
+}
+function applyArch(){
+  const parsed=document.getElementById("arch").value.split(",").map(s=>parseInt(s.trim()))
+              .filter(n=>n>0 && n<=12);
+  if(parsed.length<2){ alert("Enter at least 2 layer sizes, e.g. 3,4,2"); return; }
+  arch=parsed; inputs=[]; initInputs(); initWeights(); buildInputsGrid(); render();
+}
+document.getElementById("applyArch").onclick=applyArch;
+document.getElementById("randomize").onclick=()=>{ seed=(Date.now()&0x7fffffff)||7; initWeights(); render(); };
+document.getElementById("animate").onclick=animate;
+document.getElementById("export").onclick=exportSVG;
+["actHidden","actOut","edgeLabel","showBias","colorSign","widthMag"].forEach(id=>
+  document.getElementById(id).addEventListener("change",render));
+window.addEventListener("resize",()=>render());
+
+// ---------- Boot ----------
+initInputs(); initWeights(); buildInputsGrid(); render();
+</script>
+</body>
+</html>
