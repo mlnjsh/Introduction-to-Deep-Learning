@@ -10,5 +10,13 @@ PowerPoint decks and the course outline for the *Introduction to Deep Learning* 
 | `intro.pptx` | Introductory deck |
 | `MLP_CNN_TL.ppt` | MLPs, CNNs, and transfer learning |
 
-> Note: some very large decks (>100 MB) are kept out of the repository because they exceed
-> GitHub's per-file size limit. Ask the author for those separately.
+## Large decks (release downloads)
+
+Files over GitHub's 100 MB per-file limit can't live in the tree, so they're published as
+**release assets**:
+
+- **`Session_01.pptx`** (~147 MB) — full Session 1 lecture deck →
+  [download from the v1.0 release](https://github.com/mlnjsh/Introduction-to-Deep-Learning/releases/download/v1.0/Session_01.pptx)
+
+See all downloadable assets on the
+[**Releases page**](https://github.com/mlnjsh/Introduction-to-Deep-Learning/releases/tag/v1.0).
