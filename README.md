@@ -56,6 +56,12 @@ CNN filters, and more). → see [`notebooks/README.md`](notebooks/README.md).
 ### 4. `slides/` — Lecture slides & course outline
 PowerPoint decks and the course outline PDF. → see [`slides/README.md`](slides/README.md).
 
+### 5. Large downloads (Releases)
+Files too large for the git tree (>100 MB) are published as **release assets** on the
+[**Releases page**](https://github.com/mlnjsh/Introduction-to-Deep-Learning/releases/tag/v1.0):
+- `Session_01.pptx` (~147 MB) — full Session 1 lecture deck.
+- `best_model.keras` (~172 MB) — a saved trained Keras model checkpoint (batch-norm notebook).
+
 ### Datasets at the repo root
 - `loan_prediction_data.csv` — pre-normalized loan-approval data used by `notebooks_DeepLearning/`.
 - `housing.data.txt` — Boston-housing data used by some standalone notebooks.
