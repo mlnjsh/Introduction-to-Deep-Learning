@@ -63,6 +63,11 @@ MSE).
 A full **build-train-and-watch** playground that goes beyond a single forward/backward pass. Design a
 network, generate a dataset, and train it live — all in the browser.
 
+![Neural Lab — training an MLP on the XOR problem to 100% accuracy, with the loss landscape and optimizer trajectory](assets/neural-lab-training.gif)
+
+*Above: an MLP (2 → 8 ReLU → 4 ReLU → 1 sigmoid) learning the XOR problem — accuracy climbs from 57% to
+100% while Adam's trajectory descends the loss landscape `L(W₁, W₂)`.*
+
 ### What you can do
 - **Compose an architecture** — add fully-connected layers and set the **units** and **activation**
   (ReLU / Sigmoid / …) for each, with a live layer diagram (`Input → Hidden → Output`).
