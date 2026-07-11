@@ -84,6 +84,71 @@ Start with the **⭐ starred** items in each section; they are the highest-signa
 
 ---
 
+## 🗂️ Datasets (by problem type)
+
+Every dataset below is tagged with **the kind of ML problem it poses** so you can pick the right one
+for the concept you're teaching. *Classification* = predict a category; *Regression* = predict a
+number; *Forecasting* = predict future values of a sequence (a regression over time).
+
+### Tabular — for MLP / dense-network basics
+| Dataset | Problem type | Notes |
+|---|---|---|
+| **Iris** | Multiclass classification (3 classes) | The "hello world" of ML; 4 features, 150 rows. |
+| **Titanic** | Binary classification (survived?) | Great for feature engineering. https://www.kaggle.com/c/titanic |
+| **Breast Cancer Wisconsin** | Binary classification (malignant/benign) | Built into scikit-learn. |
+| **Adult / Census Income** | Binary classification (>50K?) | Class imbalance + categorical features. |
+| **California Housing** | **Regression** (median house value) | Modern replacement for Boston Housing; in scikit-learn. |
+| **Wine Quality** | Regression *or* classification (score 0–10) | Shows how one dataset frames both. |
+| **Bike Sharing / Auto MPG** | **Regression** (count / mpg) | Clean small regression sets. |
+| **`loan_prediction_data.csv`** (this repo) | Binary classification (approve loan?) | Used by `notebooks_DeepLearning/`. |
+
+### Images — for CNNs
+| Dataset | Problem type | Notes |
+|---|---|---|
+| **MNIST** | Multiclass classification (10 digits) | 28×28 grayscale; the CNN starter. |
+| **Fashion-MNIST** | Multiclass classification (10 clothes) | Drop-in, harder than MNIST. |
+| **CIFAR-10 / CIFAR-100** | Multiclass classification (10 / 100) | 32×32 colour; real CNN benchmark. |
+| **Cats vs Dogs** | Binary classification | Transfer-learning classic. https://www.kaggle.com/c/dogs-vs-cats |
+| **Oxford Flowers-102 / Food-101** | Fine-grained classification | Good for augmentation & transfer learning. |
+| **ImageNet (ILSVRC)** | Multiclass classification (1000) | The large-scale benchmark. https://www.image-net.org |
+
+### Text & sequences — for RNN / LSTM / GRU (the focus of `notebooks_RNN_LSTM/`)
+| Dataset | Problem type | RNN framing |
+|---|---|---|
+| ⭐ **IMDB movie reviews** | Binary **classification** (sentiment) | many-to-one: Embedding → RNN → sigmoid. *Used in this repo.* |
+| **AG News** | Multiclass classification (4 topics) | many-to-one text classification. |
+| **Reuters-21578 / 20 Newsgroups** | Multiclass classification | topic labelling from a document. |
+| **SST-2 / Yelp / Amazon reviews** | Binary/ordinal classification | sentiment; ordinal = "regression-ish" on stars. |
+| **SNLI / MultiNLI** | Classification (entail/contradict/neutral) | pair-of-sequences classification. |
+| **Penn Treebank (PTB) / WikiText-2** | **Language modeling** (next-word) | many-to-many self-supervised; predicts a distribution. |
+| **Multi30k / WMT / Tatoeba** | **Seq2seq** (translation) | encoder–decoder, many-to-many. |
+| **Names → language** (PyTorch tutorial) | Char-level classification | tiny, perfect for teaching char-RNNs. |
+
+### Time series — for RNN/LSTM **forecasting** (a regression over time)
+| Dataset | Problem type | Notes |
+|---|---|---|
+| ⭐ **Jena Climate** | **Forecasting / regression** (temperature) | sliding-window; multivariate. *Used in this repo.* |
+| **Airline Passengers / Sunspots** | Univariate forecasting | the classic tiny time-series demos. |
+| **Beijing PM2.5 Air Quality** | Forecasting / regression (pollution) | multivariate, missing values. |
+| **UCI Household Power / Electricity Load** | Forecasting / regression (energy) | long, seasonal. |
+| **M4 / M5 (Walmart)** | Forecasting (competition-grade) | thousands of series; the forecasting benchmark. |
+| **Human Activity Recognition (HAR)** | Sequence **classification** (6 activities) | accelerometer windows → label. |
+| **ECG5000 / UCR & UEA archives** | Sequence classification | 100+ labelled time-series datasets in one place. |
+
+### Audio & speech — for 1-D CNNs / RNNs
+- **Speech Commands** — keyword classification. · **UrbanSound8K** — sound classification. · **LibriSpeech** — speech-to-text (seq2seq).
+
+### 🔎 Where to load them (dataset hubs)
+- ⭐ **TensorFlow Datasets** (`tfds.load(...)`) — hundreds ready-to-stream. https://www.tensorflow.org/datasets/catalog/overview
+- ⭐ **Hugging Face Datasets** (`load_dataset(...)`). https://huggingface.co/datasets
+- ⭐ **UCI Machine Learning Repository** — the classic tabular/time-series source. https://archive.ics.uci.edu
+- **Built into the frameworks** — `keras.datasets`, `torchvision`, `torchtext`, `torchaudio`, `sklearn.datasets`.
+- **Kaggle Datasets** https://www.kaggle.com/datasets · **OpenML** https://www.openml.org
+- **Papers with Code — Datasets** (filter by task). https://paperswithcode.com/datasets
+- **Time-series specialists:** **UCR/UEA archive** (classification) https://www.timeseriesclassification.com · **Monash Forecasting Repository** https://forecastingdata.org
+
+---
+
 ## 🎓 Full Courses (free)
 
 - ⭐ **fast.ai — Practical Deep Learning for Coders** — top-down, code-first, world-class. https://course.fast.ai

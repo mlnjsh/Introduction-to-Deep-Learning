@@ -28,6 +28,34 @@ Just open `index.html` in a browser — it is fully self-contained (no dependenc
 
 ---
 
+## 🔁 Neural Network Backward-Pass (Backprop) Visualizer
+
+**▶ Open it live: https://mlnjsh.github.io/Introduction-to-Deep-Learning/backprop.html**
+
+The companion to the forward-pass tool — it shows **how the weights get updated**. Watch the
+gradient flow *backward* through the network and see every chain-rule step, for **both** problem
+types students meet first: **binary classification** (sigmoid + BCE) and **regression** (linear +
+MSE).
+
+### Features
+- **Every neuron shows two numbers** — `a` = its activation (forward, teal) and **`δ = ∂L/∂z`** (backward, orange).
+- **Full chain-rule derivation on hover** — hover a hidden neuron to expand
+  `δ = (Σ wᵢⱼ·δᵢ) · σ′(z)` with real numbers; hover an edge to see
+  `∂L/∂w = δ·a` and the update `w_new = w − η·∂L/∂w`.
+- **The "aha" simplification made visible** — for both sigmoid+BCE and linear+MSE, the output error
+  collapses to the same clean **`δ = ŷ − y`**, shown explicitly.
+- **Take a gradient step** (or run 10) and watch the **loss fall live** in the bottom bar.
+- **Edge-label modes** — show the weight `w`, its gradient `∂L/∂w`, or the update `Δw`.
+- **Animate the backward pass** layer-by-layer, edit any input/target/learning-rate, and export the diagram as SVG.
+- Gradients are **numerically verified** against finite differences, so what you see is exactly correct.
+
+### How students use it
+1. Open the link above (or `backprop.html` locally — fully self-contained).
+2. Pick a problem type, set the target `y`, hover neurons/edges to read the formulas, then press
+   **Take gradient step** and watch `δ`, the weights, and the loss all change together.
+
+---
+
 ## 📚 Course Materials
 
 Hands-on Jupyter notebooks and lecture slides. Every notebook in the two featured series below
