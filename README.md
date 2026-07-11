@@ -76,7 +76,16 @@ network, generate a dataset, and train it live — all in the browser.
 - **Train on 2-D data** — watch **Training Data & Predictions** update as the decision boundary forms.
 - **See the Loss Landscape** — visualize `L(W₁, W₂)` as a **contour map or a 3-D surface**, so students
   see *what* gradient descent is actually descending.
-- **Step-by-step** — a step counter and light/dark mode; everything runs client-side, nothing to install.
+- **Inspect the math, step by step** — dedicated **Forward Pass**, **Backpropagation**, and **Weight
+  Updates** tabs show the *actual matrices* at each step: `X @ W + b`, the chain rule
+  `∂L/∂W = ∂L/∂Y · ∂Y/∂Z · ∂Z/∂W`, and the optimizer update `W_new = W_old − η·m̂/(√v̂+ε)` with
+  colour-coded Old → Gradient → New weights.
+
+![Neural Lab — Forward Pass, Backpropagation and Weight Updates tabs showing the live matrices and formulas](assets/neural-lab-backprop-tabs.gif)
+
+*Above: cycling through the **Forward Pass** (`X @ W + b`), **Backpropagation** (chain rule + gradient
+matrices), and **Weight Updates** (Adam's Old → Gradient → New) tabs — the perfect complement to this
+course's own [Backprop Visualizer](https://mlnjsh.github.io/Introduction-to-Deep-Learning/backprop.html).*
 
 > Hosted on Replit. It complements the two SVG visualizers above: the Forward/Backward tools zoom in on
 > the math of one pass; **Neural Lab** zooms out to the full training loop and loss surface.
