@@ -68,6 +68,15 @@ Files too large for the git tree (>100 MB) are published as **release assets** o
 
 ---
 
+## 🌐 Curated Resources
+
+A companion reading list — the best **YouTube channels** (StatQuest, 3Blue1Brown, Luis Serrano,
+Karpathy…), **free books**, **interactive visualization tools**, **Kaggle** learning tracks &
+case studies, **landmark papers**, and **industry research blogs** (Google, DeepMind, Meta,
+Netflix, OpenAI, Anthropic). → see [**`RESOURCES.md`**](RESOURCES.md).
+
+---
+
 ## Environment
 
 The featured notebooks were run on TensorFlow 2.21 + PyTorch 2.11 (CPU). To run them:
