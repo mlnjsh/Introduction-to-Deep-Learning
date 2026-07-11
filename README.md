@@ -56,6 +56,28 @@ MSE).
 
 ---
 
+## 🧪 Neural Lab — Interactive Deep Learning Playground
+
+**▶ Open it live: https://neural-lab.replit.app**
+
+A full **build-train-and-watch** playground that goes beyond a single forward/backward pass. Design a
+network, generate a dataset, and train it live — all in the browser.
+
+### What you can do
+- **Compose an architecture** — add fully-connected layers and set the **units** and **activation**
+  (ReLU / Sigmoid / …) for each, with a live layer diagram (`Input → Hidden → Output`).
+- **Pick the training recipe** — choose the **loss function** (e.g. Binary Cross-Entropy) and the
+  **optimizer** (e.g. Adam).
+- **Train on 2-D data** — watch **Training Data & Predictions** update as the decision boundary forms.
+- **See the Loss Landscape** — visualize `L(W₁, W₂)` as a **contour map or a 3-D surface**, so students
+  see *what* gradient descent is actually descending.
+- **Step-by-step** — a step counter and light/dark mode; everything runs client-side, nothing to install.
+
+> Hosted on Replit. It complements the two SVG visualizers above: the Forward/Backward tools zoom in on
+> the math of one pass; **Neural Lab** zooms out to the full training loop and loss surface.
+
+---
+
 ## 📚 Course Materials
 
 Hands-on Jupyter notebooks and lecture slides. Every notebook in the two featured series below

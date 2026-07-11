@@ -64,7 +64,7 @@ Start with the **⭐ starred** items in each section; they are the highest-signa
 - **Weights & Biases** — experiment tracking & live dashboards. https://wandb.ai · **TensorBoard** — https://www.tensorflow.org/tensorboard
 - **ConvNetJS** (Karpathy) — deep learning entirely in the browser. https://cs.stanford.edu/people/karpathy/convnetjs/
 - **Neural Network SVG generator (NN-SVG)** — publication-quality architecture diagrams. https://alexlenail.me/NN-SVG/
-- **Your own repo's** [Forward-Pass Visualizer](https://mlnjsh.github.io/Introduction-to-Deep-Learning/) 😉
+- ⭐ **This course's own interactive tools** 😉 — [Forward-Pass Visualizer](https://mlnjsh.github.io/Introduction-to-Deep-Learning/) · [Backward-Pass / Backprop Visualizer](https://mlnjsh.github.io/Introduction-to-Deep-Learning/backprop.html) · [Neural Lab Playground](https://neural-lab.replit.app)
 
 ---
 
